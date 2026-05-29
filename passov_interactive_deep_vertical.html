@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Е. И. Пассов — интерактивная вертикальная листалка</title>
+  <style>
+    :root{
+      --bg1:#111027;
+      --bg2:#27164f;
+      --bg3:#3b2370;
+      --gold:#f4c76a;
+      --gold2:#fff1bd;
+      --card:#ffffff;
+      --ink:#1e1b31;
+      --muted:#6f6884;
+      --violet:#6542d8;
+      --violet2:#efe9ff;
+      --green:#20ad6d;
+      --red:#e05252;
+      --blue:#2f6fed;
+      --line:#ded4fb;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(244,199,106,.33), transparent 30%),
+        radial-gradient(circle at 90% 18%, rgba(101,66,216,.42), transparent 30%),
+        linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
+      color:var(--ink);
+      min-height:100vh;
+    }
+    .hero{
+      padding:44px 18px 22px;
+      text-align:center;
+      color:white;
+    }
+    .badge{
+      display:inline-block;
+      padding:8px 15px;
+      border:1px solid rgba(244,199,106,.6);
+      color:var(--gold2);
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      font-size:14px;
+      margin-bottom:14px;
+    }
+    h1{
+      margin:0 auto 14px;
+      max-width:980px;
+      font-size:clamp(31px,5vw,58px);
+      line-height:1.04;
+      letter-spacing:-1.5px;
+    }
+    .subtitle{
+      max-width:920px;
+      margin:0 auto;
+      color:#e6e0ff;
+      font-size:18px;
+      line-height:1.55;
+    }
+    .stats{
+      width:min(980px,94vw);
+      margin:24px auto 0;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
+    }
+    .stat{
+      background:rgba(255,255,255,.09);
+      border:1px solid rgba(255,255,255,.16);
+      color:#fff;
+      border-radius:20px;
+      padding:14px;
+      backdrop-filter:blur(10px);
+    }
+    .stat b{font-size:24px;color:var(--gold2)}
+    .stat span{display:block;font-size:13px;color:#dcd5ff;margin-top:4px}
+    .wrap{
+      width:min(1140px,94vw);
+      margin:30px auto 70px;
+      display:grid;
+      grid-template-columns: 96px 1fr;
+      gap:22px;
+      align-items:start;
+    }
+    .rail{
+      position:sticky;
+      top:18px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:26px;
+      padding:16px 10px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:9px;
+      backdrop-filter: blur(10px);
+    }
+    .dot{
+      width:48px;
+      height:48px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      color:#fff;
+      border:2px solid rgba(255,255,255,.35);
+      background:rgba(255,255,255,.12);
+      font-weight:900;
+      transition:.25s;
+    }
+    .dot.open{background:linear-gradient(135deg,var(--gold),#b37a1f); color:#24164a; transform:scale(1.04)}
+    .dot.done{background:linear-gradient(135deg,var(--green),#117c4a); color:white}
+    .line{
+      width:3px;
+      height:20px;
+      background:rgba(255,255,255,.25);
+      border-radius:99px;
+    }
+    .cards{display:flex;flex-direction:column;gap:22px}
+    .card{
+      background:var(--card);
+      border-radius:30px;
+      box-shadow:0 24px 70px rgba(0,0,0,.24);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.4);
+      opacity:.42;
+      transform:translateY(8px);
+      pointer-events:none;
+      transition:.3s;
+    }
+    .card.open{opacity:1;transform:translateY(0);pointer-events:auto}
+    .card.done{border:2px solid rgba(32,173,109,.35)}
+    .top{
+      padding:24px 28px;
+      display:flex;
+      gap:18px;
+      align-items:center;
+      background:
+        linear-gradient(90deg,#fff7df,#fff 65%),
+        radial-gradient(circle at top left, #fff1bd, transparent);
+      border-bottom:1px solid #f2e7c8;
+    }
+    .icon{
+      width:60px;height:60px;flex:0 0 60px;
+      border-radius:20px;
+      display:grid;place-items:center;
+      font-size:30px;
+      background:linear-gradient(135deg,var(--gold2),var(--gold));
+      box-shadow:inset 0 0 0 1px rgba(128,82,0,.12);
+    }
+    h2{margin:0;font-size:26px;line-height:1.15;color:#251f44}
+    .small{margin-top:6px;color:var(--muted);font-size:14px}
+    .content{padding:24px 28px 28px}
+    .read{
+      padding:20px;
+      border:1px solid var(--line);
+      background:#faf8ff;
+      border-radius:22px;
+      line-height:1.68;
+      font-size:17px;
+    }
+    .read b{color:#332160}
+    .quote{
+      margin-top:14px;
+      padding:14px 16px;
+      border-left:5px solid var(--gold);
+      background:#fffaf0;
+      border-radius:14px;
+      color:#4b3b1a;
+      line-height:1.55;
+    }
+    .practice{
+      margin-top:14px;
+      padding:16px;
+      border-radius:18px;
+      background:#eef9ff;
+      border:1px solid #ccecff;
+      line-height:1.55;
+    }
+    .practice b{color:#184d88}
+    .task{
+      margin-top:18px;
+      padding:18px;
+      border-radius:22px;
+      background:#f7f4ff;
+      border:1px dashed #c7b8f8;
+    }
+    .task h3{margin:0 0 10px;font-size:19px}
+    .answers{display:grid;gap:10px;margin-top:12px}
+    button.answer, .checkBtn, .nextBtn, .resetBtn, .hintBtn, .startFinalBtn, .finishBtn{
+      border:0;border-radius:16px;padding:14px 16px;cursor:pointer;font-weight:850;font-size:15px;transition:.2s;
+    }
+    button.answer{background:white;border:1px solid #ddd6f5;text-align:left;color:#2c254f}
+    button.answer:hover{transform:translateY(-1px);border-color:var(--violet)}
+    button.answer.correct{background:#eafff4;border-color:var(--green);color:#10643b}
+    button.answer.wrong{background:#fff0f0;border-color:var(--red);color:#9c2020}
+    input, textarea{
+      width:100%;border:1px solid #ddd6f5;border-radius:16px;padding:14px 16px;font-size:16px;outline:none;margin-top:8px;
+      font-family:inherit;
+    }
+    textarea{min-height:92px;resize:vertical}
+    input:focus, textarea:focus{border-color:var(--violet);box-shadow:0 0 0 3px rgba(101,66,216,.15)}
+    .checkBtn{background:var(--violet);color:white;margin-top:10px}
+    .hintBox{margin-top:12px}
+    .hintBtn{background:#fff;border:1px solid #ded4fb;color:#4b36a5;padding:11px 13px;font-size:14px}
+    .hintText{
+      display:none;
+      margin-top:9px;
+      background:white;
+      border:1px solid #e7e0ff;
+      padding:12px;
+      border-radius:14px;
+      color:#4c4568;
+      line-height:1.45;
+    }
+    .hintText.show{display:block}
+    .nextArea{
+      margin-top:18px;display:none;align-items:center;gap:14px;padding:16px;border-radius:22px;
+      background:linear-gradient(90deg,#eafff4,#fff);
+      border:1px solid rgba(32,173,109,.35);
+    }
+    .nextArea.show{display:flex}
+    .reward{
+      width:54px;height:54px;border-radius:50%;display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--gold2),var(--gold));
+      font-size:27px;flex:0 0 54px;animation:pop .55s ease;
+    }
+    @keyframes pop{0%{transform:scale(.5)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+    .nextBtn{margin-left:auto;background:linear-gradient(135deg,var(--gold),#b98020);color:#24164a;box-shadow:0 8px 18px rgba(185,128,32,.24)}
+    .feedback{margin-top:10px;font-weight:850}.ok{color:var(--green)}.bad{color:var(--red)}
+    .final{
+      display:none;color:white;width:min(980px,94vw);margin:0 auto 70px;padding:34px;border-radius:30px;
+      background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);box-shadow:0 20px 70px rgba(0,0,0,.2);
+    }
+    .final.show{display:block}
+    .final h2{color:white;font-size:34px;text-align:center}
+    .blitz{
+      background:white;color:#24164a;border-radius:26px;padding:24px;margin-top:22px;
+    }
+    .timer{
+      display:inline-grid;place-items:center;width:82px;height:82px;border-radius:50%;
+      background:linear-gradient(135deg,var(--gold2),var(--gold));
+      font-size:32px;font-weight:950;color:#24164a;margin:10px auto;display:grid;
+    }
+    .blitzGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+    .result{
+      display:none;margin-top:16px;padding:16px;border-radius:18px;background:#f7f4ff;line-height:1.55;
+    }
+    .result.show{display:block}
+    .certificate{
+      display:none;margin:22px auto;background:white;color:#24164a;border-radius:26px;padding:28px;border:6px double var(--gold);max-width:720px;text-align:center;
+    }
+    .certificate.show{display:block}
+    .certTitle{font-size:34px;font-weight:950;color:#24164a}
+    .resetBtn{background:white;color:#24164a;margin-top:10px}
+    .startFinalBtn{background:var(--violet);color:white}
+    .finishBtn{background:var(--green);color:white;margin-top:12px}
+    .hint{font-size:14px;color:#6b6680;margin-top:6px}
+    @media(max-width:790px){
+      .stats{grid-template-columns:1fr 1fr}
+      .wrap{grid-template-columns:1fr}
+      .rail{position:relative;top:0;flex-direction:row;overflow:auto;justify-content:flex-start}
+      .line{width:18px;height:3px}
+      .top{align-items:flex-start}
+      .nextArea{flex-wrap:wrap}
+      .nextBtn{width:100%;margin-left:0}
+      .blitzGrid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <div class="badge">Вертикальная интерактивная листалка + финальный блиц</div>
+    <h1>Ефим Израилевич Пассов: биография, идеи, труды и практика учителя</h1>
+    <p class="subtitle">Читайте фрагменты, открывайте подсказки, отвечайте на вопросы и собирайте знаки. Следующий этап открывается только после правильного ответа. В конце — 30-секундный блиц на ввод ключевых понятий.</p>
+    <div class="stats">
+      <div class="stat"><b>10</b><span>смысловых этапов</span></div>
+      <div class="stat"><b>5</b><span>подсказок в сложных вопросах</span></div>
+      <div class="stat"><b>30</b><span>секунд финального блица</span></div>
+      <div class="stat"><b>1</b><span>итоговый мини-сертификат</span></div>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <aside class="rail" id="rail"></aside>
+    <section class="cards" id="cards"></section>
+  </main>
+
+  <section class="final" id="final">
+    <h2>Финальный уровень: блиц «30 секунд» ⚡</h2>
+    <p style="text-align:center;color:#e6e0ff">Нужно быстро вписать ключевые ответы по всему маршруту. После старта таймер пойдёт вниз.</p>
+    <div class="blitz">
+      <div style="text-align:center">
+        <button class="startFinalBtn" onclick="startFinal()">Начать финальный блиц</button>
+        <div class="timer" id="timer">30</div>
+      </div>
+      <div class="blitzGrid">
+        <label>1. Фамилия учёного<input id="f1" disabled></label>
+        <label>2. Родной город<input id="f2" disabled></label>
+        <label>3. Какой подход он развивал?<input id="f3" disabled></label>
+        <label>4. Ключевое слово: речевая...<input id="f4" disabled></label>
+        <label>5. Широкое понятие: иноязычная...<input id="f5" disabled></label>
+        <label>6. Урок должен иметь ситуацию...<input id="f6" disabled></label>
+      </div>
+      <button class="finishBtn" onclick="finishFinal()">Проверить блиц</button>
+      <div class="result" id="finalResult"></div>
+    </div>
+
+    <div class="certificate" id="cert">
+      <div style="font-size:44px">🏛️</div>
+      <div class="certTitle">Сертификат мини-тренажёра</div>
+      <p><b>Подтверждает, что участник изучил маршрут</b></p>
+      <p>«Е. И. Пассов: биография, коммуникативная методика, иноязычная культура и практическая логика урока»</p>
+      <p style="color:#6b6680">Главный вывод: язык изучается не как набор правил, а как средство общения, культуры, действия и развития личности.</p>
+    </div>
+    <div style="text-align:center"><button class="resetBtn" onclick="restart()">Пройти заново</button></div>
+  </section>
+
+<script>
+const data = [
+  {
+    icon:"🌱",
+    title:"1. Начало пути: от биографии к педагогическому характеру",
+    note:"Факт + смысл",
+    text:"Ефим Израилевич Пассов родился 19 апреля 1930 года в Городке, Витебская область. Важно не просто запомнить дату, а увидеть логику его профессионального пути: будущий учёный пришёл в методику не как кабинетный теоретик, а как человек, для которого язык был связан с реальным обучением, речью, культурой и развитием личности.",
+    quote:"Запомните как формулу: биография Пассова — это путь от практики учителя к большой методической системе.",
+    practice:"<b>Практика для учителя:</b> когда рассказываете о методисте студентам, не начинайте с сухого списка дат. Начните с вопроса: «Почему учёному было важно, чтобы ученик не просто знал язык, а мог говорить?»",
+    type:"choice",
+    question:"Где родился Е. И. Пассов?",
+    answers:["В Городке, Витебская область","В Москве","В Санкт-Петербурге","В Казани"],
+    correct:0,
+    hints:["Это небольшой город, а не столица.","Город находится в Витебской области.","Название начинается на «Гор...».","Правильный ответ связан с Беларусью.","Ответ: Городок."],
+    reward:"🌱"
+  },
+  {
+    icon:"🎓",
+    title:"2. Образование и учительская основа",
+    note:"От языка к методике",
+    text:"В 1953 году Пассов окончил Минский государственный педагогический институт иностранных языков. В начале профессионального пути он работал учителем немецкого языка. Этот факт важен: его идеи выросли из понимания живого урока, где ученик боится ошибиться, не всегда видит смысл упражнения и часто знает правило, но не умеет использовать его в речи.",
+    quote:"Педагогическая сила Пассова в том, что методика у него начинается с реального ученика и реальной речевой задачи.",
+    practice:"<b>Практика для учителя:</b> перед каждым упражнением спрашивайте себя: «Что ученик после этого сможет сказать, спросить, объяснить или доказать?»",
+    type:"input",
+    question:"Какой язык Пассов преподавал в начале карьеры? Впишите одно слово.",
+    correctText:["немецкий","немецкого"],
+    hints:["Это один из европейских языков.","Не английский и не французский.","Язык Гёте и Шиллера.","Начинается на «нем...».","Ответ: немецкий."],
+    reward:"🎓"
+  },
+  {
+    icon:"💬",
+    title:"3. Коммуникативная методика: язык как действие",
+    note:"Ключевая идея",
+    text:"Одна из центральных линий научного наследия Пассова — коммуникативный подход. Его смысл не в том, чтобы просто «побольше разговаривать» на уроке. Гораздо важнее другое: речь должна появляться в ситуации, где у ученика есть мотив, роль, адресат, цель и необходимость выразить смысл. Поэтому коммуникативность — это не украшение урока, а его внутренняя логика.",
+    quote:"Правило можно знать молча. Коммуникация начинается там, где человеку нужно что-то выразить для другого человека.",
+    practice:"<b>Практика для учителя:</b> замените задание «Составьте 5 предложений» на «Убедите друга выбрать этот маршрут, используя 5 новых слов». Появляются адресат, цель и речевое действие.",
+    type:"choice",
+    question:"Что точнее всего отражает коммуникативный подход?",
+    answers:["Заучивание правил без речевой ситуации","Использование языка для решения речевой задачи","Переписывание текста без понимания","Только перевод с родного языка"],
+    correct:1,
+    hints:["Здесь важны не только слова, но и цель общения.","Ученик должен действовать речью.","Есть задача: спросить, убедить, объяснить, возразить.","Правильный ответ связан с речевой задачей.","Ответ: использование языка для решения речевой задачи."],
+    reward:"💬"
+  },
+  {
+    icon:"🧠",
+    title:"4. Речевая ситуация: мотор урока",
+    note:"Как оживить упражнение",
+    text:"В логике Пассова упражнение должно быть встроено в речевую ситуацию. Ситуация делает речь психологически оправданной: ученик понимает, зачем он говорит, кому говорит и чего хочет добиться. Без ситуации даже хорошая лексика может остаться мёртвым материалом.",
+    quote:"Ситуация — это не декорация. Это двигатель речевого действия.",
+    practice:"<b>Практика для учителя:</b> вместо «Опишите комнату» дайте ситуацию: «Вы сдаёте квартиру иностранному студенту. Опишите комнату так, чтобы он захотел её снять».",
+    type:"input",
+    question:"Дополните: ситуация делает речь психологически ________.",
+    correctText:["оправданной","естественной","мотивированной"],
+    hints:["Это значит: ученик понимает, почему он говорит.","Можно сказать: речь становится не искусственной.","Подходит слово «мотивированной».","В тексте есть слово «оправданной».","Ответ: оправданной."],
+    reward:"🧠"
+  },
+  {
+    icon:"🏛️",
+    title:"5. Иноязычная культура: шире, чем язык",
+    note:"Большое понятие",
+    text:"Пассов предлагал рассматривать обучение иностранному языку как часть иноязычного образования. В центре здесь не только грамматика, лексика и произношение, но и культура, ценности, способы общения, личностное развитие, способность понимать другого человека и действовать в иной культурной среде.",
+    quote:"Иноязычная культура — это пространство, где язык соединяется с личностью, мышлением, ценностями и общением.",
+    practice:"<b>Практика для учителя РКИ:</b> тему «Еда» можно дать не только как слова «суп, каша, чай», а как культурный сценарий: приглашение в гости, вежливая просьба, отказ, комплимент хозяину, разговор за столом.",
+    type:"choice",
+    question:"Какое понятие расширяет обучение языку до культуры и личности?",
+    answers:["Иноязычная культура","Механическая тренировка","Фонетическая зарядка","Списывание"],
+    correct:0,
+    hints:["Это не отдельное упражнение, а широкая образовательная идея.","Слово состоит из двух частей: «иноязычная» + ...","Оно связано с ценностями и общением.","Это понятие есть в названии карточки.","Ответ: иноязычная культура."],
+    reward:"🏛️"
+  },
+  {
+    icon:"📚",
+    title:"6. Научные труды: что стоит знать",
+    note:"Книги и идеи",
+    text:"Среди известных работ, связанных с наследием Пассова, обычно выделяют труды о коммуникативном методе, основах коммуникативной методики, уроке иностранного языка, иноязычном образовании и развитии индивидуальности в диалоге культур. Для учителя важно читать эти труды не как архив, а как источник проектирования урока: как поставить цель, создать ситуацию, выстроить систему упражнений и довести ученика до речевого результата.",
+    quote:"Труды Пассова полезны не только для цитирования. Их можно превратить в конструктор урока.",
+    practice:"<b>Практический приём:</b> выпишите из темы 5 слов, затем придумайте ситуацию, где без этих слов нельзя решить задачу. Так лексика превращается в инструмент общения.",
+    type:"choice",
+    question:"Как лучше использовать труды Пассова в практике?",
+    answers:["Только как список цитат для статьи","Как источник проектирования целей, ситуаций и речевых задач","Только для проверки орфографии","Как замену учебнику по грамматике"],
+    correct:1,
+    hints:["Учителю важно не просто цитировать, а строить урок.","Ищите ответ про цели и ситуации.","Труды можно применять как конструктор.","Правильный ответ содержит слова «проектирование» и «речевые задачи».","Ответ: как источник проектирования целей, ситуаций и речевых задач."],
+    reward:"📚"
+  },
+  {
+    icon:"🧩",
+    title:"7. Система упражнений: от формы к речи",
+    note:"Методический инструмент",
+    text:"Упражнение в коммуникативной методике — это не просто «сделайте номер 5». Оно должно вести ученика к речевому действию. Можно двигаться от языковой опоры к условно-речевому упражнению, а затем к свободному или более самостоятельному высказыванию. Важно, чтобы ученик не только правильно построил фразу, но и понял, зачем она нужна в общении.",
+    quote:"Хорошее упражнение — это мост: от знания формы к использованию формы в речи.",
+    practice:"<b>Мини-модель:</b> 1) дать образец; 2) потренировать форму; 3) создать ситуацию; 4) дать речевую задачу; 5) попросить ученика выразить личный смысл.",
+    type:"input",
+    question:"Дополните: хорошее упражнение ведёт от формы к ________.",
+    correctText:["речи","общению","высказыванию","действию"],
+    hints:["Не к оценке и не к списыванию.","Форма должна начать работать в коммуникации.","Можно ответить: к общению.","В тексте есть слово «речи».","Ответ: речи."],
+    reward:"🧩"
+  },
+  {
+    icon:"🎭",
+    title:"8. Личность ученика: зачем ему говорить?",
+    note:"Мотивация и смысл",
+    text:"Важная сторона подхода Пассова — внимание к личности ученика. Ученик говорит лучше, когда речь связана с его интересами, выбором, позицией, ролью и отношением. Поэтому личностный смысл не является «мягким дополнением» к уроку. Это условие, при котором речевое действие становится настоящим.",
+    quote:"Когда ученик выражает не чужую фразу, а свою позицию, язык становится личным инструментом.",
+    practice:"<b>Практика:</b> после темы «Профессии» не спрашивайте только «Кто он по профессии?». Дайте выбор: «Какая профессия будущего нужна вашему городу и почему?»",
+    type:"choice",
+    question:"Что усиливает речевую активность ученика?",
+    answers:["Полное отсутствие выбора","Личностный смысл, позиция и роль","Только длинный список слов","Запрет на собственное мнение"],
+    correct:1,
+    hints:["Ученику важно выражать не только образец, но и себя.","Ищите ответ про позицию.","Выбор и роль повышают мотивацию.","Правильный ответ связан с личностным смыслом.","Ответ: личностный смысл, позиция и роль."],
+    reward:"🎭"
+  },
+  {
+    icon:"🛠️",
+    title:"9. Как превратить идею Пассова в урок РКИ",
+    note:"Практический алгоритм",
+    text:"Практическая сила подхода Пассова в том, что из него можно собрать урок. Сначала определите речевой результат: что ученик сможет сделать языком? Затем выберите ситуацию общения, роли, языковые средства и систему упражнений. В конце нужен продукт: мини-диалог, аргумент, просьба, объяснение, рассказ, отзыв, маршрут или решение проблемы.",
+    quote:"Урок начинается не с упражнения, а с ответа на вопрос: какое речевое действие должен освоить ученик?",
+    practice:"<b>Шаблон:</b> тема → речевой результат → ситуация → роли → языковые средства → тренировка → речевой продукт → короткая рефлексия.",
+    type:"input",
+    question:"С какого вопроса лучше начинать проектирование урока? «Что ученик сможет сделать ________?»",
+    correctText:["языком","речью","словами"],
+    hints:["Ответ связан не с оценкой, а с действием.","Ученик должен что-то сделать средством общения.","Можно сказать «речью».","В цитате есть слово «языком».","Ответ: языком."],
+    reward:"🛠️"
+  },
+  {
+    icon:"🚀",
+    title:"10. Итог: почему Пассов нужен современному учителю",
+    note:"Смысл для современного образования",
+    text:"Сегодня идеи Пассова особенно актуальны, потому что ученику мало знать материал. Ему нужно уметь общаться, объяснять, задавать вопросы, действовать в новой среде, понимать культурные различия и выражать собственную позицию. Поэтому наследие Пассова помогает строить не просто урок языка, а образовательную траекторию развития личности через язык.",
+    quote:"Современный урок по Пассову — это путь от знания к действию, от упражнения к общению, от темы к личности.",
+    practice:"<b>Финальная практика:</b> возьмите любую тему РКИ и проверьте её по 5 вопросам: есть ли ситуация? есть ли адресат? есть ли мотив? есть ли речевая задача? есть ли продукт речи?",
+    type:"choice",
+    question:"Какой главный вывод ближе к наследию Пассова?",
+    answers:["Язык — это только грамматические таблицы","Урок должен вести к речевому действию, общению и развитию личности","Лучший урок — тот, где ученик молчит","Культура не связана с языком"],
+    correct:1,
+    hints:["Ищите ответ про действие и личность.","Урок не должен ограничиваться таблицами.","Коммуникация и развитие — ключевые слова.","Правильный ответ самый широкий и педагогически насыщенный.","Ответ: урок должен вести к речевому действию, общению и развитию личности."],
+    reward:"🚀"
+  }
+];
+
+let openIndex = Number(localStorage.getItem("passovDeepOpen") || 0);
+let done = JSON.parse(localStorage.getItem("passovDeepDone") || "[]");
+let hintState = {};
+if(!Array.isArray(done)) done = [];
+
+function render(){
+  const rail = document.getElementById("rail");
+  const cards = document.getElementById("cards");
+  rail.innerHTML = "";
+  cards.innerHTML = "";
+
+  data.forEach((item,i)=>{
+    const dot = document.createElement("div");
+    dot.className = "dot " + (done.includes(i) ? "done" : i<=openIndex ? "open" : "");
+    dot.textContent = done.includes(i) ? "✓" : i+1;
+    rail.appendChild(dot);
+    if(i < data.length-1){
+      const line = document.createElement("div");
+      line.className = "line";
+      rail.appendChild(line);
+    }
+
+    const card = document.createElement("article");
+    card.className = "card " + (i<=openIndex ? "open " : "") + (done.includes(i) ? "done" : "");
+    card.id = "card"+i;
+
+    let taskHTML = "";
+    if(item.type === "choice"){
+      taskHTML = `<div class="answers">${item.answers.map((a,idx)=>
+        `<button class="answer" onclick="answerChoice(${i},${idx},this)">${a}</button>`).join("")}</div>`;
+    } else {
+      taskHTML = `
+        <input id="input${i}" placeholder="Введите ответ..." onkeydown="if(event.key==='Enter') checkInput(${i})">
+        <button class="checkBtn" onclick="checkInput(${i})">Проверить</button>
+        <div class="hint">Регистр не учитывается. В некоторых заданиях возможно несколько правильных вариантов.</div>`;
+    }
+
+    const hintsHTML = `
+      <div class="hintBox">
+        <button class="hintBtn" onclick="showHint(${i})">Открыть подсказку <span id="hintCount${i}">1</span>/5</button>
+        <div class="hintText" id="hintText${i}"></div>
+      </div>`;
+
+    card.innerHTML = `
+      <div class="top">
+        <div class="icon">${item.icon}</div>
+        <div>
+          <h2>${item.title}</h2>
+          <div class="small">${item.note}</div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="read">${item.text}</div>
+        <div class="quote">${item.quote}</div>
+        <div class="practice">${item.practice}</div>
+        <div class="task">
+          <h3>${item.question}</h3>
+          ${taskHTML}
+          ${hintsHTML}
+          <div class="feedback" id="feedback${i}"></div>
+        </div>
+        <div class="nextArea ${done.includes(i) ? "show" : ""}" id="next${i}">
+          <div class="reward">${item.reward}</div>
+          <div><b>Знак получен!</b><br><span style="color:#4f8069">Можно двигаться дальше.</span></div>
+          <button class="nextBtn" onclick="goNext(${i})">${i === data.length-1 ? "Открыть финальный блиц →" : "Следующая карточка →"}</button>
+        </div>
+      </div>
+    `;
+    cards.appendChild(card);
+  });
+
+  if(done.length === data.length){
+    document.getElementById("final").classList.add("show");
+  } else {
+    document.getElementById("final").classList.remove("show");
+  }
+}
+
+function showHint(i){
+  hintState[i] = hintState[i] || 0;
+  const item = data[i];
+  const box = document.getElementById("hintText"+i);
+  const count = document.getElementById("hintCount"+i);
+  const current = Math.min(hintState[i], item.hints.length-1);
+  box.textContent = item.hints[current];
+  box.classList.add("show");
+  hintState[i] = Math.min(hintState[i]+1, item.hints.length-1);
+  count.textContent = Math.min(hintState[i]+1, 5);
+}
+
+function markDone(i){
+  if(!done.includes(i)) done.push(i);
+  if(openIndex < i+1) openIndex = i+1;
+  localStorage.setItem("passovDeepOpen", openIndex);
+  localStorage.setItem("passovDeepDone", JSON.stringify(done));
+  document.getElementById("next"+i).classList.add("show");
+  document.getElementById("feedback"+i).innerHTML = "<span class='ok'>Верно. Карточка пройдена.</span>";
+  render();
+  setTimeout(()=>document.getElementById("card"+i)?.scrollIntoView({behavior:"smooth", block:"center"}), 80);
+}
+
+function answerChoice(i,idx,btn){
+  const item = data[i];
+  const buttons = btn.parentElement.querySelectorAll("button");
+  buttons.forEach(b=>b.disabled=true);
+  if(idx === item.correct){
+    btn.classList.add("correct");
+    markDone(i);
+  } else {
+    btn.classList.add("wrong");
+    document.getElementById("feedback"+i).innerHTML = "<span class='bad'>Пока неверно. Откройте подсказку или перечитайте фрагмент.</span>";
+    setTimeout(()=>{
+      buttons.forEach(b=>{b.disabled=false; b.classList.remove("wrong")});
+    }, 900);
+  }
+}
+
+function normalize(s){
+  return (s || "").toLowerCase().trim().replaceAll("ё","е").replace(/[.,!?;:—-]/g,"").replace(/\s+/g," ");
+}
+
+function checkInput(i){
+  const val = normalize(document.getElementById("input"+i).value);
+  const ok = data[i].correctText.some(x => normalize(x) === val);
+  if(ok){
+    markDone(i);
+  } else {
+    document.getElementById("feedback"+i).innerHTML = "<span class='bad'>Пока неверно. Можно открыть до 5 подсказок.</span>";
+  }
+}
+
+function goNext(i){
+  if(i === data.length-1){
+    document.getElementById("final").classList.add("show");
+    document.getElementById("final").scrollIntoView({behavior:"smooth"});
+    return;
+  }
+  openIndex = Math.max(openIndex, i+1);
+  localStorage.setItem("passovDeepOpen", openIndex);
+  render();
+  setTimeout(()=>document.getElementById("card"+(i+1)).scrollIntoView({behavior:"smooth", block:"start"}), 80);
+}
+
+let timerInterval = null;
+let timeLeft = 30;
+function startFinal(){
+  ["f1","f2","f3","f4","f5","f6"].forEach(id=>{
+    const el = document.getElementById(id);
+    el.disabled = false;
+    el.value = "";
+  });
+  document.getElementById("finalResult").classList.remove("show");
+  document.getElementById("cert").classList.remove("show");
+  timeLeft = 30;
+  document.getElementById("timer").textContent = timeLeft;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    document.getElementById("timer").textContent = timeLeft;
+    if(timeLeft <= 0){
+      clearInterval(timerInterval);
+      finishFinal();
+    }
+  },1000);
+  document.getElementById("f1").focus();
+}
+
+function hasAny(value, variants){
+  const v = normalize(value);
+  return variants.some(x => v.includes(normalize(x)));
+}
+
+function finishFinal(){
+  clearInterval(timerInterval);
+  const checks = [
+    hasAny(document.getElementById("f1").value, ["пассов"]),
+    hasAny(document.getElementById("f2").value, ["городок"]),
+    hasAny(document.getElementById("f3").value, ["коммуникативный", "коммуникативная"]),
+    hasAny(document.getElementById("f4").value, ["задача", "деятельность", "действие"]),
+    hasAny(document.getElementById("f5").value, ["культура"]),
+    hasAny(document.getElementById("f6").value, ["общения", "общение"])
+  ];
+  const score = checks.filter(Boolean).length;
+  const result = document.getElementById("finalResult");
+  result.classList.add("show");
+  if(score >= 5){
+    result.innerHTML = `<b class="ok">Отлично: ${score}/6.</b><br>Вы быстро восстановили основные понятия: Пассов, Городок, коммуникативный подход, речевая задача, иноязычная культура, ситуация общения. Сертификат открыт.`;
+    document.getElementById("cert").classList.add("show");
+  } else {
+    result.innerHTML = `<b class="bad">Пока ${score}/6.</b><br>Повторите ключевую цепочку: Пассов → Городок → коммуникативный подход → речевая задача → иноязычная культура → ситуация общения. Затем запустите блиц ещё раз.`;
+  }
+}
+
+function restart(){
+  localStorage.removeItem("passovDeepOpen");
+  localStorage.removeItem("passovDeepDone");
+  openIndex = 0;
+  done = [];
+  hintState = {};
+  render();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+render();
+</script>
+</body>
+</html>
